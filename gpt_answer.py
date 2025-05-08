@@ -1,5 +1,4 @@
 # gpt_response.py
-
 import openai
 from dotenv import load_dotenv
 import os

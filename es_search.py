@@ -3,44 +3,49 @@ from elasticsearch import Elasticsearch
 import os
 from dotenv import load_dotenv
 
+# .env dosyasını yükle
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
-ELASTICSEARCH_URL = os.getenv('ELASTICSEARCH_URL')
-ELASTICSEARCH_API_KEY = os.getenv('ELASTICSEARCH_API_KEY')
+# Elastic Cloud bilgilerini oku
+ELASTIC_CLOUD_ID = os.getenv("ELASTIC_CLOUD_ID")
+ELASTICSEARCH_API_KEY = os.getenv("ELASTICSEARCH_API_KEY")  # format: "id:key"
 
+# Elasticsearch istemcisi oluştur
 client = Elasticsearch(
-    ELASTICSEARCH_URL,
+    cloud_id=ELASTIC_CLOUD_ID,
     api_key=ELASTICSEARCH_API_KEY
 )
 
+# Kullanılacak index listesi
 indices = [
-     "spor", "yurtlar"
+    "spor", "yurtlar"
 ]
 
 
+# Belirli bir index içinde keyword'leri ara
 def search_in_index(index_name, keywords_list, fields=["content"]):
-    search_body = {
-        "query": {
-            "bool": {
-                "should": [
-                    {
-                        "multi_match": {
-                            "query": keyword,
-                            "fields": fields,
-                            "type": "best_fields",
-                            "operator": "and",
-                            "fuzziness": "AUTO"
-                        }
+    search_query = {
+        "bool": {
+            "should": [
+                {
+                    "multi_match": {
+                        "query": keyword,
+                        "fields": fields,
+                        "type": "best_fields",
+                        "operator": "and",
+                        "fuzziness": "AUTO"
                     }
-                    for keyword in keywords_list
-                ]
-            }
+                }
+                for keyword in keywords_list
+            ]
         }
     }
-    response = client.search(index=index_name, body=search_body)
+
+    response = client.search(index=index_name, query=search_query)
     return response
 
 
+# Belgelerde arama yapan ana fonksiyon
 def search_documents(keywords_list):
     final_results = []
 
