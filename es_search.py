@@ -18,7 +18,7 @@ client = Elasticsearch(
 
 # Kullanılacak index listesi
 indices = [
-    "spor", "yurtlar"
+    "spor", "yurtlar","saglik","yemekhane","yandal","derskaydi","yazokulu","istatistikmufredat"
 ]
 
 
